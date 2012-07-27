@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+    <head>
+        <title>Kaleidoscope</title>
+        <meta charset="UTF-8" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script>
+            var proj = []
+            var tracking = true;
+
+                function completed_sort(a, b) {
+                    return new Date(b.completed).getTime() - new Date(a.completed).getTime();
+                }
+
+                function jsonp(url) {
+                    var head = document.head;
+                    var script = document.createElement("script");
+
+                    script.setAttribute("src", url);
+                    head.appendChild(script);
+                    head.removeChild(script);
+                }
+
+                function jsonpCallback(data) {
+                    proj = data.projects;
+                    proj.sort(completed_sort);
+                    $("#owner").text(data.user.name);
+                    update_thumbs(0);
+                }
+
+                function update_thumbs(idx) {
+                    for (var i = 0, l = 5; i < l; i++) {
+                        $('#img_' + i).attr('src', proj[idx + i].thumbnail.src)
+                        $('#img_' + i).data('idx', idx + i)
+                        $('#img_' + i).click(function () {
+                            var target = proj[$(this).data('idx')]
+                            $('.ksc').css('background-image', 'url(' + target.thumbnail.medium + ')');
+                        })
+                    }
+                    if (idx == 0) {
+                        $('#forward_button').attr('disabled', 'disabled');
+                    } else {
+                        $('#forward_button').removeAttr('disabled');
+                    }
+
+                    if (idx == proj.length - 5) {
+                        $('#backward_button').attr('disabled', 'disabled');
+                    } else {
+                        $('#backward_button').removeAttr('disabled');
+                    }
+                };
+
+            $(document).ready(function () {
+
+                jsonp("http://api.ravelry.com/projects/fuzzylogic/progress.json?key=a62b091085edf402cd23953b15fda055d6a6d285&status=finished&notes=true&callback=jsonpCallback")
+
+                $('#forward_button').click(function () {
+                    var current_idx = $("#img_0").data('idx')
+                    if (current_idx > 0) {
+                        update_thumbs(current_idx - 1)
+                    };
+                });
+
+                $('#backward_button').click(function () {
+                    var current_idx = $("#img_0").data('idx')
+                    if (current_idx + 5 < proj.length) {
+                        update_thumbs(current_idx + 1)
+                    };
+                });
+
+                $('.kal_cont').click(function () {
+                    tracking = !tracking;
+                    tr_status = $('#tracking_status');
+                    if (tracking){
+                      tr_status.text('Tracking is on');
+                      tr_status.css('color', 'green');
+                    }else{
+                      tr_status.text('Tracking is off');
+                      tr_status.css('color', 'red');
+                    }
+                });
+
+
+                $(".kal_cont").each(function (i) {
+
+                    $(this).mousemove(function (e) {
+                      if (tracking){
+                        $(this).find(".ksc").each(function (i) {
+                            $(this).css({
+                                backgroundPosition: e.pageX + "px " + e.pageY + "px"
+                            });
+                        });
+                      }
+                    });
+
+                });
+                
+            });
+        </script>
+        <style>
+            body {
+                background:#eee;
+                font-family:Verdana, Helvetica, Arial, sans-serif;
+                margin:0;
+                padding:0
+            }
+            #list {
+                border: thin red solid;
+                margin: auto;
+                display: block;
+                width:500px;
+                left: -20%;
+            }
+            #tracking_status{color:green;}
+            /* common kaleidoscope styles */
+            .kal_main {
+                overflow:hidden;
+                width:500px;
+                height:500px;
+                margin:auto
+            }
+            .kal_cont {
+                width:140%;
+                height:140%;
+                left:-20%;
+                top:-20%;
+                position:relative;
+                margin:auto;
+            }
+            .kal_cont .ks {
+                -webkit-transform-origin:right top;
+                -moz-transform-origin:right top;
+                -o-transform-origin:right top;
+                transform-origin:right top;
+                width:50%;
+                height:50%;
+                position:absolute;
+                top:50%;
+                left:0;
+                z-index:10;
+                overflow:hidden;
+            }
+            .kal_cont .ksc {
+                height:100%;
+                width:100%;
+                -webkit-transform:rotate(30deg);
+                -moz-transform:rotate(30deg);
+                -o-transform:rotate(30deg);
+                transform:rotate(30deg);
+                position:relative;
+                -webkit-transform-origin:left top;
+                -moz-transform-origin:left top;
+                -o-transform-origin:left top;
+                transform-origin:left top;
+                left:100%;
+                top:0;
+                background-image:url('http://images4.ravelrycache.com/uploads/fuzzylogic/108145034/P1020366_medium.JPG');
+            }
+            /* styles for each sector */
+            .kal_cont .s1 {
+                -webkit-transform: rotate(-30deg);
+                -moz-transform: rotate(-30deg);
+                -o-transform: rotate(-30deg);
+                transform: rotate(-30deg);
+            }
+            .kal_cont .s2 {
+                -webkit-transform: rotate(30deg) matrix(-1, 0, 0, 1, 0, 0);
+                -moz-transform: rotate(30deg) matrix(-1, 0, 0, 1, 0, 0);
+                -o-transform: rotate(30deg) matrix(-1, 0, 0, 1, 0, 0);
+                transform: rotate(30deg) matrix(-1, 0, 0, 1, 0, 0);
+            }
+            .kal_cont .s3 {
+                -webkit-transform: rotate(30deg);
+                -moz-transform: rotate(30deg);
+                -o-transform: rotate(30deg);
+                transform: rotate(30deg);
+            }
+            .kal_cont .s4 {
+                -webkit-transform: rotate(90deg) matrix(-1, 0, 0, 1, 0, 0);
+                -moz-transform: rotate(90deg) matrix(-1, 0, 0, 1, 0, 0);
+                -o-transform: rotate(90deg) matrix(-1, 0, 0, 1, 0, 0);
+                transform: rotate(90deg) matrix(-1, 0, 0, 1, 0, 0);
+            }
+            .kal_cont .s5 {
+                -webkit-transform: rotate(90deg);
+                -moz-transform: rotate(90deg);
+                -o-transform: rotate(90deg);
+                transform: rotate(90deg);
+            }
+            .kal_cont .s6 {
+                -webkit-transform: rotate(150deg) matrix(-1, 0, 0, 1, 0, 0);
+                -moz-transform: rotate(150deg) matrix(-1, 0, 0, 1, 0, 0);
+                -o-transform: rotate(150deg) matrix(-1, 0, 0, 1, 0, 0);
+                transform: rotate(150deg) matrix(-1, 0, 0, 1, 0, 0);
+            }
+            .kal_cont .s7 {
+                -webkit-transform: rotate(150deg);
+                -moz-transform: rotate(150deg);
+                -o-transform: rotate(150deg);
+                transform: rotate(150deg);
+            }
+            .kal_cont .s8 {
+                -webkit-transform: rotate(210deg) matrix(-1, 0, 0, 1, 0, 0);
+                -moz-transform: rotate(210deg) matrix(-1, 0, 0, 1, 0, 0);
+                -o-transform: rotate(210deg) matrix(-1, 0, 0, 1, 0, 0);
+                transform: rotate(210deg) matrix(-1, 0, 0, 1, 0, 0);
+            }
+            .kal_cont .s9 {
+                -webkit-transform: rotate(210deg);
+                -moz-transform: rotate(210deg);
+                -o-transform: rotate(210deg);
+                transform: rotate(210deg);
+            }
+            .kal_cont .s10 {
+                -webkit-transform: rotate(270deg) matrix(-1, 0, 0, 1, 0, 0);
+                -moz-transform: rotate(270deg) matrix(-1, 0, 0, 1, 0, 0);
+                -o-transform: rotate(270deg) matrix(-1, 0, 0, 1, 0, 0);
+                transform: rotate(270deg) matrix(-1, 0, 0, 1, 0, 0);
+            }
+            .kal_cont .s11 {
+                -webkit-transform: rotate(270deg);
+                -moz-transform: rotate(270deg);
+                -o-transform: rotate(270deg);
+                transform: rotate(270deg);
+            }
+            .kal_cont .s12 {
+                -webkit-transform: rotate(330deg) matrix(-1, 0, 0, 1, 0, 0);
+                -moz-transform: rotate(330deg) matrix(-1, 0, 0, 1, 0, 0);
+                -o-transform: rotate(330deg) matrix(-1, 0, 0, 1, 0, 0);
+                transform: rotate(330deg) matrix(-1, 0, 0, 1, 0, 0);
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="example">
+            <div class="kal_main">
+                <div class="kal_cont">
+                    <div class="ks s1">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s2">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s3">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s4">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s5">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s6">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s7">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s8">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s9">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s10">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s11">
+                        <div class="ksc"></div>
+                    </div>
+                    <div class="ks s12">
+                        <div class="ksc"></div>
+                    </div>
+                </div>
+            </div>
+            <div id='list'>
+                <p id='tracking_status'>Tracking is on</p>
+                <button type='button' id='forward_button'><<</button>
+                <img id='img_0' class='thumbs' />
+                <img id='img_1' class='thumbs' />
+                <img id='img_2' class='thumbs' />
+                <img id='img_3' class='thumbs' />
+                <img id='img_4' class='thumbs' />
+                <button type='button' id='backward_button'>>></button>
+            </div>
+        </div>
+
+        <div style="clear:both;">
+            <p>
+                <a href="http://www.script-tutorials.com/creating-kaleidoscope-using-jquery-and-css/">H/T</a>
+            </p>
+        </div>
+    </body>
+
+</html>
