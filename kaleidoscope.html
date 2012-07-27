@@ -9,47 +9,47 @@
             var proj = []
             var tracking = true;
 
-                function completed_sort(a, b) {
-                    return new Date(b.completed).getTime() - new Date(a.completed).getTime();
+            function completed_sort(a, b) {
+                return new Date(b.completed).getTime() - new Date(a.completed).getTime();
+            }
+
+            function jsonp(url) {
+                var head = document.head;
+                var script = document.createElement("script");
+
+                script.setAttribute("src", url);
+                head.appendChild(script);
+                head.removeChild(script);
+            }
+
+            function jsonpCallback(data) {
+                proj = data.projects;
+                proj.sort(completed_sort);
+                $("#owner").text(data.user.name);
+                update_thumbs(0);
+            }
+
+            function update_thumbs(idx) {
+                for (var i = 0, l = 5; i < l; i++) {
+                    $('#img_' + i).attr('src', proj[idx + i].thumbnail.src)
+                    $('#img_' + i).data('idx', idx + i)
+                    $('#img_' + i).click(function () {
+                        var target = proj[$(this).data('idx')]
+                        $('.ksc').css('background-image', 'url(' + target.thumbnail.medium + ')');
+                    })
+                }
+                if (idx == 0) {
+                    $('#forward_button').attr('disabled', 'disabled');
+                } else {
+                    $('#forward_button').removeAttr('disabled');
                 }
 
-                function jsonp(url) {
-                    var head = document.head;
-                    var script = document.createElement("script");
-
-                    script.setAttribute("src", url);
-                    head.appendChild(script);
-                    head.removeChild(script);
+                if (idx == proj.length - 5) {
+                    $('#backward_button').attr('disabled', 'disabled');
+                } else {
+                    $('#backward_button').removeAttr('disabled');
                 }
-
-                function jsonpCallback(data) {
-                    proj = data.projects;
-                    proj.sort(completed_sort);
-                    $("#owner").text(data.user.name);
-                    update_thumbs(0);
-                }
-
-                function update_thumbs(idx) {
-                    for (var i = 0, l = 5; i < l; i++) {
-                        $('#img_' + i).attr('src', proj[idx + i].thumbnail.src)
-                        $('#img_' + i).data('idx', idx + i)
-                        $('#img_' + i).click(function () {
-                            var target = proj[$(this).data('idx')]
-                            $('.ksc').css('background-image', 'url(' + target.thumbnail.medium + ')');
-                        })
-                    }
-                    if (idx == 0) {
-                        $('#forward_button').attr('disabled', 'disabled');
-                    } else {
-                        $('#forward_button').removeAttr('disabled');
-                    }
-
-                    if (idx == proj.length - 5) {
-                        $('#backward_button').attr('disabled', 'disabled');
-                    } else {
-                        $('#backward_button').removeAttr('disabled');
-                    }
-                };
+            };
 
             $(document).ready(function () {
 
@@ -72,12 +72,12 @@
                 $('.kal_cont').click(function () {
                     tracking = !tracking;
                     tr_status = $('#tracking_status');
-                    if (tracking){
-                      tr_status.text('Tracking is on');
-                      tr_status.css('color', 'green');
-                    }else{
-                      tr_status.text('Tracking is off');
-                      tr_status.css('color', 'red');
+                    if (tracking) {
+                        tr_status.text('Tracking is on');
+                        tr_status.css('color', 'green');
+                    } else {
+                        tr_status.text('Tracking is off');
+                        tr_status.css('color', 'red');
                     }
                 });
 
@@ -85,24 +85,24 @@
                 $(".kal_cont").each(function (i) {
 
                     $(this).mousemove(function (e) {
-                      if (tracking){
-                        $(this).find(".ksc").each(function (i) {
-                            $(this).css({
-                                backgroundPosition: e.pageX + "px " + e.pageY + "px"
+                        if (tracking) {
+                            $(this).find(".ksc").each(function (i) {
+                                $(this).css({
+                                    backgroundPosition: e.pageX + "px " + e.pageY + "px"
+                                });
                             });
-                        });
-                      }
+                        }
                     });
 
                 });
-                
+
             });
         </script>
         <style>
             body {
                 background:#eee;
                 font-family:Verdana, Helvetica, Arial, sans-serif;
-                margin:0;
+                margin:30px;
                 padding:0
             }
             #list {
@@ -110,15 +110,18 @@
                 margin: auto;
                 display: block;
                 width:500px;
-                left: -20%;
+                float:left;
             }
-            #tracking_status{color:green;}
+            #tracking_status {
+                color:green;
+            }
             /* common kaleidoscope styles */
             .kal_main {
                 overflow:hidden;
                 width:500px;
                 height:500px;
-                margin:auto
+                margin:auto;
+                float:right;
             }
             .kal_cont {
                 width:140%;
@@ -234,6 +237,9 @@
     </head>
     
     <body>
+        <div style='width:500px; float:left;'>
+            <h1>Fuzzyhubby's Fuzzylogic Project Kaleidoscope</h1>
+        </div>
         <div class="example">
             <div class="kal_main">
                 <div class="kal_cont">
@@ -275,18 +281,18 @@
                     </div>
                 </div>
             </div>
-            <div id='list'>
-                <p id='tracking_status'>Tracking is on</p>
-                <button type='button' id='forward_button'><<</button>
-                <img id='img_0' class='thumbs' />
-                <img id='img_1' class='thumbs' />
-                <img id='img_2' class='thumbs' />
-                <img id='img_3' class='thumbs' />
-                <img id='img_4' class='thumbs' />
-                <button type='button' id='backward_button'>>></button>
-            </div>
         </div>
-
+        <div id='list'>
+            <p id='tracking_status'>Tracking is on</p>
+            <button type='button' id='forward_button'>
+                <<</button>
+                    <img id='img_0' class='thumbs' />
+                    <img id='img_1' class='thumbs' />
+                    <img id='img_2' class='thumbs' />
+                    <img id='img_3' class='thumbs' />
+                    <img id='img_4' class='thumbs' />
+                    <button type='button' id='backward_button'>>></button>
+        </div>
         <div style="clear:both;">
             <p>
                 <a href="http://www.script-tutorials.com/creating-kaleidoscope-using-jquery-and-css/">H/T</a>
