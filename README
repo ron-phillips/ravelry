@@ -1,3 +1,5 @@
 This application lets a user render a project image as a kaleidoscope. The user can choose the image to be rendered, use the mouse to move the kaleidoscope around, and then click the kaleidoscope to turn mouse tracking on/off. Turning the tracking off allows the image to be screen captured.
 
 It is useful for color and pattern exploration and inspiration. While the page can be adapted by entering other username/key combinations in the code, it is actually envisioned as a design to be included in a user's ravelry site.
+
+Works in any modern, compliant browser. Internet Explorer is not supported at this time.
